@@ -1,18 +1,46 @@
-[%bs.raw {|require('codemirror/lib/codemirror.css')|}];
-[%bs.raw {|require('codemirror/mode/javascript/javascript')|}];
 
-type state = {count: int};
+let exampleSnippet = {|import React from "react";
+import PropTypes from 'prop-types';
+import { Card } from "semantic-ui-react";
+import { capitalize, join, split, map, flow } from "lodash";
+
+// takes string and splits into words based on spaces
+const splitOnSpaces = str => split(str, " ");
+
+// takes an array of words and capitalizes first letter, returns array
+const capitilizeWordList = wordList => map(wordList, capitalize);
+
+// takes an array of string and joins them with spaces
+const joinOnSpaces = list => join(list, " ");
+
+const formatName = flow(splitOnSpaces, capitilizeWordList, joinOnSpaces);
+
+const Food = ({ brand, name }) => {
+  return (
+    <Card.Content>
+      <Card.Header>{`${brand} ${formatName(name)}`}</Card.Header>
+    </Card.Content>
+  );
+};
+
+Food.propTypes = {
+  brand: PropTypes.number.isRequired,
+  name: PropTypes.string.isRequired,
+};
+
+export default Food;
+|};
+
+type state = {editorContent: string};
 
 type action =
-  | Increment
-  | Decrement;
+  | OnTextChange(string);
 
-let initialState = {count: 0};
+let initialState = {editorContent: exampleSnippet};
 
-let reducer = (state, action) =>
+let reducer = (_, action) =>
   switch (action) {
-  | Increment => {count: state.count + 1}
-  | Decrement => {count: state.count - 1}
+  | OnTextChange(text) => {editorContent: text}
   };
 
 [@react.component]
@@ -20,18 +48,9 @@ let make = () => {
   let (state, dispatch) = React.useReducer(reducer, initialState);
 
   <main>
-    {React.string("Simple counter with reducer")}
-    <div>
-      <button onClick={_ => dispatch(Decrement)}>
-        {React.string("Decrement")}
-      </button>
-      <span className="counter">
-        {state.count |> string_of_int |> React.string}
-      </span>
-      <button onClick={_ => dispatch(Increment)}>
-        {React.string("Increment")}
-      </button>
-    </div>
-    <CodeMirror value="() => { console.log('stuff'); }" />
+    <Editor
+      value={state.editorContent}
+      onChange={(value) => dispatch(OnTextChange(value))}
+    />
   </main>;
 };
