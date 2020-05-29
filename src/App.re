@@ -1,4 +1,3 @@
-
 let exampleSnippet = {|import React from "react";
 import PropTypes from 'prop-types';
 import { Card } from "semantic-ui-react";
@@ -45,12 +44,8 @@ let reducer = (_, action) =>
 
 [@react.component]
 let make = () => {
-  let (state, dispatch) = React.useReducer(reducer, initialState);
-
-  <main>
-    <Editor
-      value={state.editorContent}
-      onChange={(value) => dispatch(OnTextChange(value))}
-    />
-  </main>;
+  <ReactExperimental.Suspense
+    fallback={<div> {React.string("Loading...")} </div>}>
+    <main> <GithubFileContentEditor /> </main>
+  </ReactExperimental.Suspense>;
 };
